@@ -41,15 +41,16 @@ let adminController = function (Admin) {
 
     const getAdminByID = async (req, res) => {
         logger.info('getAdminByID called.');
-        logger.debug('getAdminByID called. Admin ID: ' + req.params.id );
         try {
-            const details = await fetchAdminDetails(req.params.id);
-            logger.info('getAdminByID done.');
-            logger.debug('getAdminByID done. Admin Details: ' + JSON.stringify(details, null, 2));
-            res.status(200).send({
-                status: "success",
-                data: details
-            })
+          const user = res.locals.loggedInUser;
+          logger.debug('getAdminByID called. Email ID: ' + user.email );
+          const details = await fetchAdminDetails(user.email);
+          logger.info('getAdminByID done.');
+          logger.debug('getAdminByID done. Admin Details: ' + JSON.stringify(details, null, 2));
+          res.status(200).send({
+              status: "success",
+              data: details
+          })
         }
         catch (err) {
             logger.error('getAdminByID failed : ', err);
@@ -101,12 +102,12 @@ let adminController = function (Admin) {
         });
     };
 
-    const fetchAdminDetails = (adminId) => {
+    const fetchAdminDetails = (emailId) => {
         logger.info('fetchAdminDetails called.');
-        logger.debug('fetchAdminDetails called. Admin Id: ' + adminId);
+        logger.debug('fetchAdminDetails called. Admin Id: ' + emailId);
         return new Promise((resolve, reject) => {
             const filterObj = { 
-                _id: adminId 
+                email: emailId 
             };
             Admin.findOne(filterObj).exec(async (err, res) => {
                 if (err) {
@@ -144,5 +145,39 @@ let adminController = function (Admin) {
         removeAdmin
     };
 };
+
+
+// // Add this to the top of the file
+// const { roles } = require('../roles')
+ 
+// exports.grantAccess = function(action, resource) {
+//  return async (req, res, next) => {
+//   try {
+//    const permission = roles.can(req.user.role)[action](resource);
+//    if (!permission.granted) {
+//     return res.status(401).json({
+//      error: "You don't have enough permission to perform this action"
+//     });
+//    }
+//    next()
+//   } catch (error) {
+//    next(error)
+//   }
+//  }
+// }
+ 
+// exports.allowIfLoggedin = async (req, res, next) => {
+//  try {
+//   const user = res.locals.loggedInUser;
+//   if (!user)
+//    return res.status(401).json({
+//     error: "You need to be logged in to access this route"
+//    });
+//    req.user = user;
+//    next();
+//   } catch (error) {
+//    next(error);
+//   }
+// }
 
 module.exports = adminController;
