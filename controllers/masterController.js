@@ -402,7 +402,7 @@ exports.login = async (req, res, next) => {
     logger.info('login called.');
     const { email, password } = req.body;
     logger.debug('login called. email: ' + email);
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email, status: "active" });
     if (!user) return next(new Error('Email does not exist'));
     const validPassword = await validatePassword(password, user.password);
     if (!validPassword) return next(new Error('Password is not correct'))
