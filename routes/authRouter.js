@@ -9,6 +9,7 @@ var Branch = require("./../models/branchModel");
 var Parent = require("./../models/parentModel");
 var Student = require("./../models/studentModel");
 var Teacher = require("./../models/teacherModel");
+var Session = require("./../models/sessionModel")
 var Organization = require("../models/organizationModel");
 
 // #master
@@ -25,7 +26,10 @@ authRouter.delete("/user/:userId", masterController.allowIfLoggedin, masterContr
 
 // #admin
 var adminController = require("./../controllers/adminController")(Admin);
-authRouter.post("/admin", masterController.allowIfLoggedin, masterController.grantAccess('updateAny', 'admin'), adminController.addAdmin);
+authRouter.post("/admin", adminController.addAdmin);
+authRouter.get("/admin/:orgId", adminController.getAdminByOrgID);
+authRouter.get("/adminbranch/:branchId", adminController.getAdminByBranchID);
+
 authRouter.get("/admins", masterController.allowIfLoggedin, masterController.grantAccess('readAny', 'admin'), adminController.getAdmin);
 authRouter.get("/admin", masterController.allowIfLoggedin, masterController.grantAccess('readOwn', 'admin'), adminController.getAdminByID);
 authRouter.put("/admin/:adminId", masterController.allowIfLoggedin, masterController.grantAccess('updateAny', 'admin'), adminController.updateAdmin);
@@ -33,7 +37,8 @@ authRouter.delete("/admin/:adminId", masterController.allowIfLoggedin, masterCon
 
 // #admin
 var branchController = require("./../controllers/branchController")(Branch);
-authRouter.post("/branch", masterController.allowIfLoggedin, masterController.grantAccess('updateAny', 'branch'), branchController.addBranch);
+authRouter.post("/branch", branchController.addBranch);
+authRouter.get("/branches/:orgId", branchController.getBranchByOrgID)
 authRouter.get("/branches", masterController.allowIfLoggedin, masterController.grantAccess('readAny', 'branch'), branchController.getBranch);
 authRouter.get("/branch", masterController.allowIfLoggedin, masterController.grantAccess('readOwn', 'branch'), branchController.getBranchByID);
 authRouter.put("/branch/:branchId", masterController.allowIfLoggedin, masterController.grantAccess('updateAny', 'branch'), branchController.updateBranch);
@@ -41,7 +46,7 @@ authRouter.delete("/branch/:branchId", masterController.allowIfLoggedin, masterC
 
 // #class
 var classroomController = require("../controllers/classroomController")(Classroom);
-authRouter.post("/classroom", masterController.allowIfLoggedin, masterController.grantAccess('updateAny', 'classroom'), classroomController.addClassroom);
+authRouter.post("/classroom", classroomController.addClassroom);
 authRouter.get("/classrooms", masterController.allowIfLoggedin, masterController.grantAccess('readAny', 'classroom'), classroomController.getClassroom);
 authRouter.get("/classroom", masterController.allowIfLoggedin, masterController.grantAccess('readOwn', 'classroom'), classroomController.getClassroomByID);
 authRouter.put("/classroom/:roomId", masterController.allowIfLoggedin, masterController.grantAccess('updateAny', 'classroom'), classroomController.updateClassroom);
@@ -49,8 +54,8 @@ authRouter.delete("/classroom/:roomId", masterController.allowIfLoggedin, master
 
 // #organisation
 var organizationController = require("../controllers/organizationController")(Organization);
-authRouter.post("/organization", masterController.allowIfLoggedin, masterController.grantAccess('updateAny', 'organization'), organizationController.addOrganization);
-authRouter.get("/organizations", masterController.allowIfLoggedin, masterController.grantAccess('readAny', 'organization'), organizationController.getOrganization);
+authRouter.post("/organization", organizationController.addOrganization);
+authRouter.get("/organizations", organizationController.getOrganization);
 authRouter.get("/organization", masterController.allowIfLoggedin, masterController.grantAccess('readOwn', 'organization'), organizationController.getOrganizationByID);
 authRouter.put("/organization/:orgId", masterController.allowIfLoggedin, masterController.grantAccess('updateAny', 'organization'), organizationController.updateOrganization);
 authRouter.delete("/organization/:orgId", masterController.allowIfLoggedin, masterController.grantAccess('deleteAny', 'organization'), organizationController.removeOrganization);
@@ -79,5 +84,11 @@ authRouter.get("/teachers", masterController.allowIfLoggedin, masterController.g
 authRouter.get("/teacher", masterController.allowIfLoggedin, masterController.grantAccess('readOwn', 'teacher'), teacherController.getTeacherByID);
 authRouter.put("/teacher/:teacherId", masterController.allowIfLoggedin, masterController.grantAccess('updateAny', 'teacher'), teacherController.updateTeacher);
 authRouter.delete("/teacher/:teacherId", masterController.allowIfLoggedin, masterController.grantAccess('deleteAny', 'teacher'), teacherController.removeTeacher);
+
+
+// #session 
+var sessionController = require("./../controllers/sessionController")(Session);
+authRouter.post("/session", sessionController.createSession);
+authRouter.get("/sessions", sessionController.getSession)
 
 module.exports = authRouter;

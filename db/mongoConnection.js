@@ -5,7 +5,7 @@ const logger = require("../commons/logger")('mongoConnection');
 //mongoose support callback by default means they return callback, to return as promises we use below line
 mongoose.Promise = global.Promise;
 
-const uri = config.mongooseUri;
+const uri = "mongodb+srv://test-admin:test1234@cluster0-z4nl7.mongodb.net/test?retryWrites=true&w=majority"
 //console.log("url", uri)
 
 mongoose.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false }, function (err) {

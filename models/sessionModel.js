@@ -8,6 +8,7 @@ var Session = mongoose.Schema({
     endTime: Date,
     classroom: { type: ObjectId, ref: 'Classroom' },
     noOfAttendies: Number,
+    uniqueMeetingId: Number,
     recordingURL: String
 });
 

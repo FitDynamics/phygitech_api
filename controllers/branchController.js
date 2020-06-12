@@ -7,7 +7,10 @@ let branchController = function (Branch) {
     const addBranch = async (req, res) => {
         logger.info('addBranch called.');
         logger.debug('addBranch called.', req.body.data);
-        Branch.create(req.body.data, function (err, data) {
+
+        console.log(req.body)
+
+        Branch.create(req.body, function (err, data) {
           if (err || !data) {
             logger.error('addBranch failed : ', err);
             res.status(500);
@@ -59,6 +62,38 @@ let branchController = function (Branch) {
         }
     };
 
+    const getBranchByOrgID = async (req, res) => {
+      logger.info('getBranchByOrgID called.');
+      logger.debug('getBranchByOrgID called. Branch ID: ' + req.params.orgId );
+      try {
+          const details = await fetchBranchDetails(req.params.orgId);
+          logger.info('getBranchByOrgID done.');
+          logger.debug('getBranchByOrgID done. Branch Details: ' + JSON.stringify(details, null, 2));
+          var completedata = []
+          for (key in details) {
+            let item = details[key]
+          
+            let innerObj = {
+              id: item._id,
+              name: item.name,
+              location: item.address.district,
+              email: item.email
+            }
+  
+            await completedata.push(innerObj)
+          }
+          res.status(200)
+          res.send(completedata)
+      }
+      catch (err) {
+          logger.error('getBranchByOrgID failed : ', err);
+          res.status(500).send({
+              status: "failed",
+              message: err.message
+          })
+      }
+  };
+
     const updateBranch = async (req, res) => {
         logger.info('updateBranch called.');
         logger.debug('updateBranch called. Branch ID: ' + req.params.id );
@@ -105,9 +140,9 @@ let branchController = function (Branch) {
         logger.debug('fetchBranchDetails called. Branch Id: ' + branchId);
         return new Promise((resolve, reject) => {
             const filterObj = { 
-                _id: branchId 
+                organization: branchId 
             };
-            Branch.findOne(filterObj).exec(async (err, res) => {
+            Branch.find(filterObj).exec(async (err, res) => {
                 if (err) {
                     logger.error('fetchBranchDetails failed : ', err);
                     reject(err);
@@ -139,6 +174,7 @@ let branchController = function (Branch) {
     addBranch,
     getBranch,
     getBranchByID,
+    getBranchByOrgID,
     updateBranch,
     removeBranch
   };

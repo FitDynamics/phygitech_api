@@ -5,6 +5,7 @@ var addressModel = new mongoose.Schema({
     line1: String,
     line2: String, //optional
     line3: String, //optional
+    district: String,
     city: String,
     state: String,
     pinCode: Number

@@ -5,7 +5,7 @@ var Admin = mongoose.Schema({
     name: { type : String , required : true },
     mobileNo: { type : Number , unique : true, required : true },
     email: { type : String , unique : true, required : true },
-    accessLevel: { type: [ObjectId], ref: 'Branch' },
+    accessLevel: { type: ObjectId, ref: 'Branch' },
     orgAccess: { type: ObjectId, ref: 'Organization' },
     role: { type : String , required : true }, // superAdmin | orgAdmin | branchAdmin
     status: { type : String, default: "active"} // active | inactive

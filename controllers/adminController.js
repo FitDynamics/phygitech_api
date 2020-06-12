@@ -7,6 +7,7 @@ let adminController = function (Admin) {
     const addAdmin = async (req, res) => {
         logger.info('addAdmin called.');
         logger.debug('addAdmin called.' + JSON.stringify(req.body));
+        console.log(req.body)
         Admin.create(req.body, function (err, data) {
           if (err || !data) {
             logger.error('addAdmin failed : ', err);
@@ -38,6 +39,73 @@ let adminController = function (Admin) {
           }
         });
     };
+
+    const getAdminByBranchID = async (req, res) => {
+      logger.info('getAdminByBranchID called.');
+      try {
+        logger.debug('getAdminByBranchID called. Org ID: ' + req.params.branchId );
+        
+        const details = await fetchBranchAdminDetails(req.params.branchId);
+        logger.info('getAdminByBranchID done.');
+        logger.debug('getAdminByBranchID done. Admin Details: ' + JSON.stringify(details, null, 2));
+
+        var completedata = []
+        for (key in details) {
+          let item = details[key]
+        
+          let innerObj = {
+            name: item.name,
+            email: item.email,
+            mobileNo: item.mobileNo
+          }
+
+          await completedata.push(innerObj)
+        }
+        res.status(200)
+        res.send(completedata)
+      }
+      catch (err) {
+          logger.error('getAdminByOrgID failed : ', err);
+          res.send({
+              status: "failed",
+              message: err.message
+          })
+      }
+  };
+
+    const getAdminByOrgID = async (req, res) => {
+      logger.info('getAdminByOrgID called.');
+      try {
+        logger.debug('getAdminByOrgID called. Org ID: ' + req.params.orgId );
+        
+        const details = await fetchOrgAdminDetails(req.params.orgId);
+        logger.info('getAdminByOrgID done.');
+        logger.debug('getAdminByOrgID done. Admin Details: ' + JSON.stringify(details, null, 2));
+        console.log(details)
+
+        var completedata = []
+        for (key in details) {
+          let item = details[key]
+        
+          let innerObj = {
+            name: item.name,
+            email: item.email,
+            mobileNo: item.mobileNo
+          }
+
+          await completedata.push(innerObj)
+        }
+        res.status(200)
+        res.send(completedata)
+      }
+      catch (err) {
+          logger.error('getAdminByOrgID failed : ', err);
+          res.send({
+              status: "failed",
+              message: err.message
+          })
+      }
+  };
 
     const getAdminByID = async (req, res) => {
         logger.info('getAdminByID called.');
@@ -102,14 +170,14 @@ let adminController = function (Admin) {
         });
     };
 
-    const fetchAdminDetails = (emailId) => {
+    const fetchAdminDetails = (email) => {
         logger.info('fetchAdminDetails called.');
-        logger.debug('fetchAdminDetails called. Admin Id: ' + emailId);
+        logger.debug('fetchAdminDetails called. Email Id: ' + email);
         return new Promise((resolve, reject) => {
             const filterObj = { 
-                email: emailId 
+                email: email 
             };
-            Admin.findOne(filterObj).exec(async (err, res) => {
+            Admin.find(filterObj).exec(async (err, res) => {
                 if (err) {
                     logger.error('fetchAdminDetails failed : ', err);
                     reject(err);
@@ -120,6 +188,44 @@ let adminController = function (Admin) {
             })
         })
     };
+
+    const fetchOrgAdminDetails = (orgId) => {
+      logger.info('fetchAdminDetails called.');
+      logger.debug('fetchAdminDetails called. Org Id: ' + orgId);
+      return new Promise((resolve, reject) => {
+          const filterObj = { 
+              orgAccess: orgId 
+          };
+          Admin.find(filterObj).exec(async (err, res) => {
+              if (err) {
+                  logger.error('fetchAdminDetails failed : ', err);
+                  reject(err);
+              }
+              logger.info('fetchAdminDetails done.');
+              logger.debug('fetchAdminDetails done. ' + JSON.stringify(res, null, 2));
+              resolve(res);
+          })
+      })
+  };
+
+    const fetchBranchAdminDetails = (branchId) => {
+      logger.info('fetchAdminDetails called.');
+      logger.debug('fetchAdminDetails called. Org Id: ' + branchId);
+      return new Promise((resolve, reject) => {
+          const filterObj = { 
+              accessLevel: branchId 
+          };
+          Admin.find(filterObj).exec(async (err, res) => {
+              if (err) {
+                  logger.error('fetchAdminDetails failed : ', err);
+                  reject(err);
+              }
+              logger.info('fetchAdminDetails done.');
+              logger.debug('fetchAdminDetails done. ' + JSON.stringify(res, null, 2));
+              resolve(res);
+          })
+      })
+  };
 
     const saveAdmin = (adminID, updatedJson) => {
         logger.info('saveAdmin called.');
@@ -142,7 +248,9 @@ let adminController = function (Admin) {
         getAdmin,
         getAdminByID,
         updateAdmin,
-        removeAdmin
+        removeAdmin,
+        getAdminByOrgID,
+        getAdminByBranchID
     };
 };
 

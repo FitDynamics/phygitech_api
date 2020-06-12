@@ -7,7 +7,17 @@ let organizationController = function (Organization) {
   const addOrganization = async (req, res) => {
     logger.info('addOrganization called.');
     logger.debug('addOrganization called.', req.body.data);
-    Organization.create(req.body.data, function (err, data) {
+
+    let innerObj = {
+      legalEntityName: req.body.displayName,
+      address: {
+        city: req.body.location
+      },
+      email: req.body.email,
+      contactNo: req.body.contactNo
+    }
+
+    Organization.create(innerObj, function (err, data) {
       if (err || !data) {
         logger.error('addOrganization failed : ', err);
         res.status(500);
@@ -23,7 +33,7 @@ let organizationController = function (Organization) {
 
 const getOrganization = async (req, res) => {
     logger.info('getOrganization called.');
-    Organization.find(function (err, data) {
+    Organization.find( async function (err, data) {
       if (err || !data) {
         logger.error('getOrganization failed : ', err);
         res.status(500);
@@ -32,8 +42,21 @@ const getOrganization = async (req, res) => {
       else {
         logger.info('getOrganization done.');
         logger.debug('getOrganization done.', data);
-        res.status(200);
-        res.send(data);
+
+        var completedata = []
+        for (key in data) {
+          let item = data[key]
+        
+          let innerObj = {
+            id: item._id,
+            name: item.legalEntityName,
+            contactNo: item.contactNo,
+            email: item.email,
+            address: item.address.city
+          }
+          await completedata.push(innerObj)
+        }
+        res.send(completedata);
       }
     });
 };

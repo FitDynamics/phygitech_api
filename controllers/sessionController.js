@@ -24,7 +24,7 @@ let sessionController = function (Session) {
 
     const getSession = async (req, res) => {
         logger.info('getSession called.');
-        Session.find(function (err, data) {
+        Session.find( async function (err, data) {
           if (err || !data) {
             logger.error('getSession failed : ', err);
             res.status(500);
@@ -33,8 +33,21 @@ let sessionController = function (Session) {
           else {
             logger.info('getSession done.');
             logger.debug('getSession done.', data);
-            res.status(200);
-            res.send(data);
+
+            var completedata = []
+            for (key in data) {
+              let item = data[key]
+            
+              let innerObj = {
+                name: item.name,
+                date: item.scheduledDate,
+                starttime: item.startTime,
+                endtime: item.endTime,
+                meetingId: item.uniqueMeetingId
+              }
+              await completedata.push(innerObj)
+            }
+            res.send(completedata);
           }
         });
     };
