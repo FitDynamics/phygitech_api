@@ -7,7 +7,7 @@ var Classroom = mongoose.Schema({
     classTeacher: { type: ObjectId, ref: 'Teacher'},
     branch: {type: ObjectId, ref: 'Branch'},
     status: { type : String, default: "active"}, // active | inactive
-    category: String // pre-primary | primary | secondary | sr-secondary
+    category: String // pre-primary, primary, 
 });
 
 module.exports = mongoose.model("Classroom", Classroom, "classroom");

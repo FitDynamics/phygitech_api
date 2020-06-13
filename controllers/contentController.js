@@ -24,7 +24,7 @@ let contentController = function (Content) {
 
     const getContent = async (req, res) => {
         logger.info('getContent called.');
-        Content.find(function (err, data) {
+        Content.find( async function (err, data) {
           if (err || !data) {
             logger.error('getContent failed : ', err);
             res.status(500);
@@ -33,11 +33,45 @@ let contentController = function (Content) {
           else {
             logger.info('getContent done.');
             logger.debug('getContent done.', data);
-            res.status(200);
-            res.send(data);
+            var completedata = []
+            for (key in data) {
+             
+              let item = data[key]
+             
+              await completedata.push(item)
+            }
+            res.send(completedata);
           }
         });
     };
+
+    const getContentByCategory = async (req, res) => {
+      logger.info('getContent called.');
+      Content.find( async function (err, data) {
+        if (err || !data) {
+          logger.error('getContent failed : ', err);
+          res.status(500);
+          res.send(err);
+        }
+        else {
+          logger.info('getContent done.');
+          logger.debug('getContent done.', data);
+          var completedata = []
+          for (key in data) {
+           
+            let item = data[key]
+            let innerObj = {
+              name: item.name,
+              category: item.category,
+              url: item.url
+            }
+            console.log(innerObj)
+            await completedata.push(innerObj)
+          }
+          res.send(completedata);
+        }
+      });
+  };
 
     const getContentByID = async (req, res) => {
         logger.info('getContentByID called.');
@@ -142,7 +176,8 @@ let contentController = function (Content) {
         getContent,
         getContentByID,
         updateContent,
-        removeContent
+        removeContent,
+        getContentByCategory
     };
 };
 

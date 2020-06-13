@@ -10,6 +10,7 @@ var Parent = require("./../models/parentModel");
 var Student = require("./../models/studentModel");
 var Teacher = require("./../models/teacherModel");
 var Session = require("./../models/sessionModel")
+var Content = require("./../models/contentModel")
 var Organization = require("../models/organizationModel");
 
 // #master
@@ -45,9 +46,9 @@ authRouter.put("/branch/:branchId", masterController.allowIfLoggedin, masterCont
 authRouter.delete("/branch/:branchId", masterController.allowIfLoggedin, masterController.grantAccess('deleteAny', 'branch'), branchController.removeBranch);
 
 // #class
-var classroomController = require("../controllers/classroomController")(Classroom);
+var classroomController = require("../controllers/classroomController")(Classroom, Teacher);
 authRouter.post("/classroom", classroomController.addClassroom);
-authRouter.get("/classrooms", masterController.allowIfLoggedin, masterController.grantAccess('readAny', 'classroom'), classroomController.getClassroom);
+authRouter.get("/classrooms", classroomController.getClassroom);
 authRouter.get("/classroom", masterController.allowIfLoggedin, masterController.grantAccess('readOwn', 'classroom'), classroomController.getClassroomByID);
 authRouter.put("/classroom/:roomId", masterController.allowIfLoggedin, masterController.grantAccess('updateAny', 'classroom'), classroomController.updateClassroom);
 authRouter.delete("/classroom/:roomId", masterController.allowIfLoggedin, masterController.grantAccess('deleteAny', 'classroom'), classroomController.removeClassroom);
@@ -70,17 +71,17 @@ authRouter.put("/parent/:parentId", masterController.allowIfLoggedin, masterCont
 authRouter.delete("/parent/:parentId", masterController.allowIfLoggedin, masterController.grantAccess('deleteAny', 'parent'), parentController.removeParent);
 
 // #student
-var studentController = require("./../controllers/studentController")(Student);
-authRouter.post("/student", masterController.allowIfLoggedin, masterController.grantAccess('updateAny', 'student'), studentController.addStudent);
-authRouter.get("/students", masterController.allowIfLoggedin, masterController.grantAccess('readAny', 'student'), studentController.getStudent);
+var studentController = require("./../controllers/studentController")(Student, Classroom);
+authRouter.post("/student", studentController.addStudent);
+authRouter.get("/students", studentController.getStudent);
 authRouter.get("/student", masterController.allowIfLoggedin, masterController.grantAccess('readOwn', 'student'), studentController.getStudentByID);
 authRouter.put("/student/:studentId", masterController.allowIfLoggedin, masterController.grantAccess('updateAny', 'student'), studentController.updateStudent);
 authRouter.delete("/student/:studentId", masterController.allowIfLoggedin, masterController.grantAccess('deleteAny', 'student'), studentController.removeStudent);
 
 // #teacher
-var teacherController = require("./../controllers/teacherController")(Teacher);
-authRouter.post("/teacher", masterController.allowIfLoggedin, masterController.grantAccess('updateAny', 'teacher'), teacherController.addTeacher);
-authRouter.get("/teachers", masterController.allowIfLoggedin, masterController.grantAccess('readAny', 'teacher'), teacherController.getTeacher);
+var teacherController = require("./../controllers/teacherController")(Teacher, Classroom);
+authRouter.post("/teacher", teacherController.addTeacher);
+authRouter.get("/teachers", teacherController.getTeacher);
 authRouter.get("/teacher", masterController.allowIfLoggedin, masterController.grantAccess('readOwn', 'teacher'), teacherController.getTeacherByID);
 authRouter.put("/teacher/:teacherId", masterController.allowIfLoggedin, masterController.grantAccess('updateAny', 'teacher'), teacherController.updateTeacher);
 authRouter.delete("/teacher/:teacherId", masterController.allowIfLoggedin, masterController.grantAccess('deleteAny', 'teacher'), teacherController.removeTeacher);
@@ -90,5 +91,10 @@ authRouter.delete("/teacher/:teacherId", masterController.allowIfLoggedin, maste
 var sessionController = require("./../controllers/sessionController")(Session);
 authRouter.post("/session", sessionController.createSession);
 authRouter.get("/sessions", sessionController.getSession)
+
+// content
+var contentController = require("./../controllers/contentController")(Content);
+authRouter.get("/content", contentController.getContent)
+authRouter.get("/studentcontent", contentController.getContentByCategory)
 
 module.exports = authRouter;

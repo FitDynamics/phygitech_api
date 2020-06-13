@@ -2,12 +2,12 @@ const logger = require("../commons/logger")('studentController');
 const chalk = require('chalk');
 
 //create, update city
-let studentController = function (Student) {
+let studentController = function (Student, Classroom) {
 
     const addStudent = async (req, res) => {
         logger.info('addStudent called.');
-        logger.debug('addStudent called.', req.body.data);
-        Student.create(req.body.data, function (err, data) {
+        logger.debug('addStudent called.', req.body);
+        Student.create(req.body, function (err, data) {
           if (err || !data) {
             logger.error('addStudent failed : ', err);
             res.status(500);
@@ -21,9 +21,26 @@ let studentController = function (Student) {
         });
     };
 
+      const getClassName = (classId) => {
+        return new Promise((resolve, reject) => {
+          const filterObj = { 
+              _id: classId
+          };
+          Classroom.findOne(filterObj).exec(async (err, res) => {
+              if (err) {
+                  logger.error('classname failed : ', err);
+                  reject(err);
+              }
+              logger.info('classname done.');
+              logger.debug('classname done. ' + JSON.stringify(res, null, 2));
+              resolve(res);
+          })
+      })
+    }
+    
     const getStudent = async (req, res) => {
         logger.info('getStudent called.');
-        Student.find(function (err, data) {
+        Student.find( async function (err, data) {
           if (err || !data) {
             logger.error('getStudent failed : ', err);
             res.status(500);
@@ -32,8 +49,22 @@ let studentController = function (Student) {
           else {
             logger.info('getStudent done.');
             logger.debug('getStudent done.', data);
-            res.status(200);
-            res.send(data);
+            var completedata = []
+            for (key in data) {
+              let item = data[key]
+
+              const classname = await getClassName(item.class)
+              console.log(classname)
+            
+              let innerObj = {
+                name: item.name,
+                mobileNo: item.mobileNo,
+                address: item.address.city,
+                class: classname[0].name
+              }
+              await completedata.push(innerObj)
+            }
+            res.send(completedata);
           }
         });
     };

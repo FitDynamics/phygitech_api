@@ -1,13 +1,15 @@
 const logger = require("../commons/logger")('teacherController');
 const chalk = require('chalk');
+var mongoose = require("mongoose");
+var ObjectId = mongoose.Schema.Types.ObjectId;
 
 //create, update city
-let teacherController = function (Teacher) {
+let teacherController = function (Teacher, Classroom) {
 
     const addTeacher = async (req, res) => {
         logger.info('addTeacher called.');
-        logger.debug('addTeacher called.', req.body.data);
-        Teacher.create(req.body.data, function (err, data) {
+        logger.debug('addTeacher called.', req.body);
+        Teacher.create(req.body, function (err, data) {
           if (err || !data) {
             logger.error('addTeacher failed : ', err);
             res.status(500);
@@ -21,9 +23,26 @@ let teacherController = function (Teacher) {
         });
     };
 
+    const getClassName = (classId) => {
+        return new Promise((resolve, reject) => {
+          const filterObj = { 
+              _id: classId
+          };
+          Classroom.find(filterObj).exec(async (err, res) => {
+              if (err) {
+                  logger.error('classname failed : ', err);
+                  reject(err);
+              }
+              logger.info('classname done.');
+              logger.debug('classname done. ' + JSON.stringify(res, null, 2));
+              resolve(res.name);
+          })
+      })
+    }
+
     const getTeacher = async (req, res) => {
         logger.info('getTeacher called.');
-        Teacher.find(function (err, data) {
+        Teacher.find( async function (err, data) {
           if (err || !data) {
             logger.error('getTeacher failed : ', err);
             res.status(500);
@@ -32,9 +51,25 @@ let teacherController = function (Teacher) {
           else {
             logger.info('getTeacher done.');
             logger.debug('getTeacher done.', data);
-            res.status(200);
-            res.send(data);
-          }
+            var completedata = []
+              for (key in data) {
+                let item = data[key]
+
+                const classname = await getClassName(item.class)
+                console.log(classname)
+              
+                let innerObj = {
+                  value: item._id,
+                  label: item.name,
+                  name: item.name,
+                  mobileNo: item.mobileNo,
+                  address: item.address.city,
+                  class: classname[0].name
+                }
+                await completedata.push(innerObj)
+              }
+              res.send(completedata);
+            }
         });
     };
 

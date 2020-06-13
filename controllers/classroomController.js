@@ -2,12 +2,12 @@ const logger = require("../commons/logger")('classroomController');
 const chalk = require('chalk');
 
 //create, update city
-let classroomController = function (Classroom) {
+let classroomController = function (Classroom, Teacher) {
 
   const addClassroom = async (req, res) => {
     logger.info('addClassroom called.');
-    logger.debug('addClassroom called.', req.body.data);
-    Classroom.create(req.body.data, function (err, data) {
+    logger.debug('addClassroom called.', req.body);
+    Classroom.create(req.body, function (err, data) {
       if (err || !data) {
         logger.error('addClassroom failed : ', err);
         res.status(500);
@@ -21,9 +21,27 @@ let classroomController = function (Classroom) {
     });
 };
 
+const getTeacherName = (teacherId) => {
+  console.log(teacherId)
+  return new Promise((resolve, reject) => {
+    const filterObj = { 
+        _id: teacherId
+    };
+    Teacher.find(filterObj).exec(async (err, res) => {
+        if (err) {
+            logger.error('teachername failed : ', err);
+            reject(err);
+        }
+        logger.info('teachername done.');
+        logger.debug('teachername done. ' + JSON.stringify(res, null, 2));
+        resolve(res);
+    })
+})
+}
+
 const getClassroom = async (req, res) => {
     logger.info('getClassroom called.');
-    Classroom.find(function (err, data) {
+    Classroom.find( async function (err, data) {
       if (err || !data) {
         logger.error('getClassroom failed : ', err);
         res.status(500);
@@ -32,8 +50,24 @@ const getClassroom = async (req, res) => {
       else {
         logger.info('getClassroom done.');
         logger.debug('getClassroom done.', data);
-        res.status(200);
-        res.send(data);
+        var completedata = []
+        for (key in data) {
+          let item = data[key]
+
+          const teachername = await getTeacherName(item.classTeacher)
+        
+          let innerObj = {
+            value: item._id,
+            label: item.name,
+            name: item.name,
+            teacher: teachername[0].name,
+            category: item.category,
+          }
+
+          console.log(innerObj)
+          await completedata.push(innerObj)
+        }
+        res.send(completedata);
       }
     });
 };
