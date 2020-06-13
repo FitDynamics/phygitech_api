@@ -52,9 +52,9 @@ let studentController = function (Student, Classroom) {
             var completedata = []
             for (key in data) {
               let item = data[key]
-
+              console.log("*****",item)
               const classname = await getClassName(item.class)
-              console.log(classname)
+              
             
               let innerObj = {
                 name: item.name,
