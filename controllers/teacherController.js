@@ -56,7 +56,7 @@ let teacherController = function (Teacher, Classroom) {
                 let item = data[key]
 
                 const classname = await getClassName(item.class)
-                console.log(classname)
+                // console.log(classname)
               
                 let innerObj = {
                   value: item._id,
@@ -64,7 +64,7 @@ let teacherController = function (Teacher, Classroom) {
                   name: item.name,
                   mobileNo: item.mobileNo,
                   address: item.address.city,
-                  class: classname[0].name
+                  // class: classname[0].name
                 }
                 await completedata.push(innerObj)
               }
