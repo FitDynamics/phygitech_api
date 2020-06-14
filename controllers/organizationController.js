@@ -61,11 +61,34 @@ const getOrganization = async (req, res) => {
     });
 };
 
+// const getOrganizationByEmail = async (email) => {
+//   return new Promise((resolve, reject) => {
+//   logger.info('getOrganizationByEmail called.');
+//   logger.debug('getOrganizationByEmail called. Organization ID: ' + email);
+//   try {
+//       const filterObj = { 
+//         email: email 
+//       };
+//       const details = await fetchOrganizationDetails(filterObj);
+//       logger.info('getOrganizationByEmail done.');
+//       logger.debug('getOrganizationByEmail done. Organization Details: ' + JSON.stringify(details, null, 2));
+//       resolve(details);
+//   }
+//   catch (err) {
+//       logger.error('getOrganizationByEmail failed : ', err);
+//       reject({ message: err });
+//   }
+// });
+// };
+
 const getOrganizationByID = async (req, res) => {
     logger.info('getOrganizationByID called.');
     logger.debug('getOrganizationByID called. Organization ID: ' + req.params.id );
     try {
-        const details = await fetchOrganizationDetails(req.params.id);
+        const filterObj = { 
+          _id: req.params.id 
+        };
+        const details = await fetchOrganizationDetails(filterObj);
         logger.info('getOrganizationByID done.');
         logger.debug('getOrganizationByID done. Organization Details: ' + JSON.stringify(details, null, 2));
         res.status(200).send({
@@ -123,24 +146,7 @@ const removeOrganization = async (req, res) => {
     });
 };
 
-const fetchOrganizationDetails = (organizationId) => {
-    logger.info('fetchOrganizationDetails called.');
-    logger.debug('fetchOrganizationDetails called. Organization Id: ' + organizationId);
-    return new Promise((resolve, reject) => {
-        const filterObj = { 
-            _id: organizationId 
-        };
-        Organization.findOne(filterObj).exec(async (err, res) => {
-            if (err) {
-                logger.error('fetchOrganizationDetails failed : ', err);
-                reject(err);
-            }
-            logger.info('fetchOrganizationDetails done.');
-            logger.debug('fetchOrganizationDetails done. ' + JSON.stringify(res, null, 2));
-            resolve(res);
-        })
-    })
-};
+
 
 const saveOrganization = (organizationID, updatedJson) => {
     logger.info('saveOrganization called.');
@@ -165,6 +171,23 @@ const saveOrganization = (organizationID, updatedJson) => {
     updateOrganization,
     removeOrganization
   };
+};
+
+exports.fetchOrganizationDetails = async function (filterObj) {
+  logger.info('fetchOrganizationDetails called.');
+  logger.debug('fetchOrganizationDetails called. Organization Id: ' + organizationId);
+  return new Promise((resolve, reject) => {
+      
+      Organization.findOne(filterObj).exec(async (err, res) => {
+          if (err) {
+              logger.error('fetchOrganizationDetails failed : ', err);
+              reject(err);
+          }
+          logger.info('fetchOrganizationDetails done.');
+          logger.debug('fetchOrganizationDetails done. ' + JSON.stringify(res, null, 2));
+          resolve(res);
+      })
+  })
 };
 
 module.exports = organizationController;

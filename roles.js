@@ -21,6 +21,17 @@ exports.roles = (function () {
         .updateAny("student")
         .deleteAny("student")
 
+        ac.grant("org-admin")
+        .extend("branch-admin")
+        .createAny("branch")
+        .updateAny("branch")
+        .deleteAny("branch")
+        .createAny("meeting")
+        .updateAny("teacher")
+        .deleteAny("teacher")
+        .updateAny("student")
+        .deleteAny("student")
+
     ac.grant("super-admin")
         .extend("branch-admin")
         .readOwn("admin")
