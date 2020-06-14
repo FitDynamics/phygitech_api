@@ -414,12 +414,15 @@ exports.login = async (req, res, next) => {
     await User.findByIdAndUpdate(user._id, { accessToken })
     logger.debug('login done. newUser: ' + user.email);
     logger.info('login done.');
-    var responseata = {};
+    var responseata = { 
+      email: user.email, 
+      role: user.role};
     if (user.role === "org-admin") {
       const filterObj = { 
         email: email 
       };
       const details = await orgController.fetchOrganizationDetails(filterObj);
+      console.log(details)
       responseata = {
         orgID: details._id,
         email: user.email, 

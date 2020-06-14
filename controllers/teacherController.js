@@ -6,6 +6,24 @@ var ObjectId = mongoose.Schema.Types.ObjectId;
 //create, update city
 let teacherController = function (Teacher, Classroom) {
 
+      const saveClassTeacher = (teacherid, classID) => {
+          const filterObj = { 
+              _id: classID
+          };
+
+          let innerObj = {
+            classTeacher: teacherid
+          }
+          Classroom.findOneAndUpdate(filterObj, innerObj, {upsert: true }, (async (err, res) => {
+              if (err) {
+                  logger.error('class teacher failed : ', err);
+                  reject(err);
+              }
+              logger.info('class teacher done.');
+              logger.debug('classteacher done. ' + JSON.stringify(res, null, 2));
+      }))
+    }
+
     const addTeacher = async (req, res) => {
         logger.info('addTeacher called.');
         logger.debug('addTeacher called.', req.body);
@@ -19,6 +37,9 @@ let teacherController = function (Teacher, Classroom) {
             logger.info('addTeacher done.');
             res.status(200);
             res.send("success");
+
+            saveClassTeacher(data._id, data.class)
+            console.log(data)
           }
         });
     };
@@ -35,7 +56,7 @@ let teacherController = function (Teacher, Classroom) {
               }
               logger.info('classname done.');
               logger.debug('classname done. ' + JSON.stringify(res, null, 2));
-              resolve(res.name);
+              resolve(res);
           })
       })
     }
@@ -56,7 +77,7 @@ let teacherController = function (Teacher, Classroom) {
                 let item = data[key]
 
                 const classname = await getClassName(item.class)
-                // console.log(classname)
+                console.log(classname)
               
                 let innerObj = {
                   value: item._id,
@@ -64,7 +85,7 @@ let teacherController = function (Teacher, Classroom) {
                   name: item.name,
                   mobileNo: item.mobileNo,
                   address: item.address.city,
-                  // class: classname[0].name
+                  class: classname[0].name
                 }
                 await completedata.push(innerObj)
               }

@@ -54,14 +54,18 @@ let studentController = function (Student, Classroom) {
               let item = data[key]
               console.log("*****",item)
               const classname = await getClassName(item.class)
+
+              console.log(classname.name)
               
             
               let innerObj = {
                 name: item.name,
                 mobileNo: item.mobileNo,
                 address: item.address.city,
-                class: classname[0].name
+                class: classname.name
               }
+
+              console.log(innerObj)
               await completedata.push(innerObj)
             }
             res.send(completedata);

@@ -64,7 +64,6 @@ const getClassroom = async (req, res) => {
             category: item.category,
           }
 
-          console.log(innerObj)
           await completedata.push(innerObj)
         }
         res.send(completedata);

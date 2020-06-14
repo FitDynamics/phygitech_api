@@ -47,6 +47,7 @@ let sessionController = function (Session) {
               }
               await completedata.push(innerObj)
             }
+            console.log(completedata)
             res.send(completedata);
           }
         });
