@@ -146,6 +146,22 @@ const removeOrganization = async (req, res) => {
     });
 };
 
+const fetchOrganizationDetails = async function (filterObj) {
+  logger.info('fetchOrganizationDetails called.');
+  logger.debug('fetchOrganizationDetails called. Organization Id: ' + filterObj);
+  return new Promise((resolve, reject) => {
+      
+      Organization.findOne(filterObj).exec(async (err, res) => {
+          if (err) {
+              logger.error('fetchOrganizationDetails failed : ', err);
+              reject(err);
+          }
+          logger.info('fetchOrganizationDetails done.');
+          logger.debug('fetchOrganizationDetails done. ' + JSON.stringify(res, null, 2));
+          resolve(res);
+      })
+  })
+};
 
 
 const saveOrganization = (organizationID, updatedJson) => {
@@ -169,25 +185,9 @@ const saveOrganization = (organizationID, updatedJson) => {
     getOrganization,
     getOrganizationByID,
     updateOrganization,
-    removeOrganization
+    removeOrganization,
+    fetchOrganizationDetails
   };
-};
-
-exports.fetchOrganizationDetails = async function (filterObj) {
-  logger.info('fetchOrganizationDetails called.');
-  logger.debug('fetchOrganizationDetails called. Organization Id: ' + organizationId);
-  return new Promise((resolve, reject) => {
-      
-      Organization.findOne(filterObj).exec(async (err, res) => {
-          if (err) {
-              logger.error('fetchOrganizationDetails failed : ', err);
-              reject(err);
-          }
-          logger.info('fetchOrganizationDetails done.');
-          logger.debug('fetchOrganizationDetails done. ' + JSON.stringify(res, null, 2));
-          resolve(res);
-      })
-  })
 };
 
 module.exports = organizationController;

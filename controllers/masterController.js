@@ -363,7 +363,8 @@
 
 const logger = require("../commons/logger")('masterController');
 const User = require('../models/userModel');
-const orgController = require('../controllers/organizationController');
+var Organization = require("../models/organizationModel");
+const orgController = require('../controllers/organizationController')(Organization);
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const { roles } = require('../roles');
@@ -419,10 +420,14 @@ exports.login = async (req, res, next) => {
         email: email 
       };
       const details = await orgController.fetchOrganizationDetails(filterObj);
-      console.log(details);
+      responseata = {
+        orgID: details._id,
+        email: user.email, 
+        role: user.role
+      }
     }
     res.status(200).json({
-      data: { email: user.email, role: user.role },
+      data: responseata,
       accessToken
     })
   } catch (error) {
