@@ -19,7 +19,7 @@ var Student = mongoose.Schema({
     email: String,
     photoURL: String,
     address: addressModel,
-    class: { type: ObjectId, ref: 'Class' },
+    class: { type: ObjectId, ref: 'Classroom' },
     status: { type : String, default: "active"} // active | inactive
 });
 

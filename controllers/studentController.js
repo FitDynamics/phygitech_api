@@ -1,7 +1,7 @@
 const logger = require("../commons/logger")('studentController');
 const chalk = require('chalk');
 
-//create, update city
+//create, update Student
 let studentController = function (Student, Classroom) {
 
     const addStudent = async (req, res) => {
@@ -20,27 +20,13 @@ let studentController = function (Student, Classroom) {
           }
         });
     };
-
-      const getClassName = (classId) => {
-        return new Promise((resolve, reject) => {
-          const filterObj = { 
-              _id: classId
-          };
-          Classroom.findOne(filterObj).exec(async (err, res) => {
-              if (err) {
-                  logger.error('classname failed : ', err);
-                  reject(err);
-              }
-              logger.info('classname done.');
-              logger.debug('classname done. ' + JSON.stringify(res, null, 2));
-              resolve(res);
-          })
-      })
-    }
     
     const getStudent = async (req, res) => {
         logger.info('getStudent called.');
-        Student.find( async function (err, data) {
+        Student.find()
+        .populate({path : 'class', select: "_id name category"})
+        .lean()
+        .exec( function (err, data) {
           if (err || !data) {
             logger.error('getStudent failed : ', err);
             res.status(500);
@@ -52,21 +38,16 @@ let studentController = function (Student, Classroom) {
             var completedata = []
             for (key in data) {
               let item = data[key]
-              console.log("*****",item)
-              const classname = await getClassName(item.class)
-
-              console.log(classname.name)
-              
             
               let innerObj = {
                 name: item.name,
                 mobileNo: item.mobileNo,
                 address: item.address.city,
-                class: classname.name
+                class: item.class.name,
+                category: item.class.category
               }
 
-              console.log(innerObj)
-              await completedata.push(innerObj)
+              completedata.push(innerObj)
             }
             res.send(completedata);
           }
@@ -135,14 +116,17 @@ let studentController = function (Student, Classroom) {
         });
     };
 
-    const fetchStudentDetails = (studentId) => {
+    const fetchStudentDetails = async function (filterObj) {
         logger.info('fetchStudentDetails called.');
-        logger.debug('fetchStudentDetails called. Student Id: ' + studentId);
+        logger.debug('fetchStudentDetails called. Filter Obj: ' + filterObj);
         return new Promise((resolve, reject) => {
-            const filterObj = { 
-                _id: studentId 
-            };
-            Student.findOne(filterObj).exec(async (err, res) => {
+            // const filterObj = { 
+            //     _id: studentId 
+            // };
+            Student.find(filterObj)
+            .populate({path : 'class', select: "_id name category"})
+            .lean()
+            .exec( function (err, res) {
                 if (err) {
                     logger.error('fetchStudentDetails failed : ', err);
                     reject(err);
@@ -175,7 +159,8 @@ let studentController = function (Student, Classroom) {
     getStudent,
     getStudentByID,
     updateStudent,
-    removeStudent
+    removeStudent,
+    fetchStudentDetails
   };
 };
 
